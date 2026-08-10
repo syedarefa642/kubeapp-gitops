@@ -70,7 +70,7 @@ GitHub Actions
           NodePort
              │
              ▼
-        🌐 Website
+        🌐 Website - (http://35.175.210.26:30080/home.html)
 ```
 
 ---
