@@ -27,7 +27,7 @@ The workflow uses:
 The following architecture represents the complete CI/CD and GitOps workflow.
 
 <p align="center">
-  <img src="images/architecture.png" alt="KubeApp Architecture" width="900">
+  <img width="1536" height="1024" alt="KubeApp Architecture" src="https://github.com/user-attachments/assets/368d836a-68aa-4273-af99-805dc04c6357" />
 </p>
 
 ---
