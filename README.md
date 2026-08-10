@@ -395,52 +395,20 @@ Then save the changes.
 - ✅ AWS EC2 deployment
 - ✅ Automated application updates
 
----
-
-# 📸 Project Screenshots
-
-## 🏗️ Architecture
-
-<p align="center">
-  <img src="images/architecture.png" alt="KubeApp Architecture" width="900">
-</p>
-
----
-
-## ⚙️ GitHub Actions
-
-<p align="center">
-  <img src="images/github-actions.png" alt="GitHub Actions CI Pipeline" width="900">
-</p>
-
----
-
-## 🐳 Docker Hub
-
-<p align="center">
-  <img src="images/dockerhub.png" alt="Docker Hub Image" width="900">
-</p>
-
----
-
-## 🐙 ArgoCD
-
-<p align="center">
-  <img src="images/argocd.png" alt="ArgoCD Application" width="900">
-</p>
-
----
-
 ## 🖥️ Live Website
 
 <p align="center">
-  <img src="images/website.png" alt="KubeApp Website" width="900">
+  <img width="1356" height="590" alt="KubeApp(1)" src="https://github.com/user-attachments/assets/62764ff4-729f-4db1-a2cd-f6ed0f64f3c3" />
+  <img width="1346" height="580" alt="KubeApp(2)" src="https://github.com/user-attachments/assets/8f8bdff4-a4a9-4d13-94c5-cc4fd4371acb" />
+<img width="1325" height="589" alt="KubeApp(3)" src="https://github.com/user-attachments/assets/24604396-9364-4490-916f-42086aac304d" />
+<img width="1338" height="591" alt="KubeApp(4)" src="https://github.com/user-attachments/assets/a1829674-3634-4684-8450-e146812b6695" />
+<img width="1349" height="595" alt="Kubeapp-status(1)" src="https://github.com/user-attachments/assets/1da6fbc5-d63b-46f3-bf85-42998226ac5f" />
+<img width="1356" height="596" alt="Kubeapp-status(2)" src="https://github.com/user-attachments/assets/ceba871c-e1e6-4c6d-865a-13a6555323fe" />
+<img width="1356" height="596" alt="Kubeapp-status(3)" src="https://github.com/user-attachments/assets/3e853800-85bb-4f0c-a77d-b320d6e05c69" />
+<img width="1344" height="593" alt="Kubeapp-status(4)" src="https://github.com/user-attachments/assets/1ea51e1f-a3de-404f-ab7b-bb1e67f9a0e8" />
 </p>
 
 ---
-
 # 👨‍💻 Author
-
 **Syeda Refa**
-
 DevOps | Kubernetes | Docker | GitHub Actions | ArgoCD | AWS | CI/CD
