@@ -9,6 +9,9 @@ spec:
     matchLabels:
       app: frontend
   template:
+    metadata:
+      labels:
+        app: frontend
     spec:
       containers:
         - name: frontend
@@ -23,4 +26,3 @@ spec:
             limits:
               cpu: 200m
               memory: 128Mi
-
