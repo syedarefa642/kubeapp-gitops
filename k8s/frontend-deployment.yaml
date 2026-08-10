@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: refa642/kubeapp-frontend:<commit-sha>
+          image: refa642/kubeapp-frontend:3d0bdee56aa01ca36dbc84ac820f1441b73721e4
           imagePullPolicy: Always
           ports:
             - containerPort: 80
