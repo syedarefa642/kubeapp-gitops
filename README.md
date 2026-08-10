@@ -91,9 +91,8 @@ GitHub Actions automatically builds the frontend Docker image, pushes the image 
 
 ### GitHub Actions Workflow
 
-<p align="center">
-  <img src="images/github-actions.png" alt="GitHub Actions CI Pipeline" width="900">
-</p>
+<img width="1342" height="599" alt="GitHub Actions" src="https://github.com/user-attachments/assets/e191253a-bdd0-43f4-bcd4-d154ba1256b6" />
+
 
 The GitHub Actions workflow completed successfully.
 
@@ -133,7 +132,7 @@ When GitHub Actions updates the Kubernetes deployment manifest, ArgoCD detects t
 The KubeApp application is successfully synchronized and healthy.
 
 <p align="center">
-  <img src="images/argocd.png" alt="ArgoCD Application" width="900">
+  <img width="1365" height="598" alt="ArgoCD" src="https://github.com/user-attachments/assets/26871813-fa6d-4573-b5a0-6feebb49e202" />
 </p>
 
 ### ArgoCD Status
@@ -185,9 +184,7 @@ The frontend application is served through Nginx and exposed using a Kubernetes 
 
 ### KubeApp Website
 
-<p align="center">
-  <img src="images/website.png" alt="KubeApp Website" width="900">
-</p>
+
 
 ### Access the Application
 
