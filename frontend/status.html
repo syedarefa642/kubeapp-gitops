@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KubeApp — Cluster Status</title>
+  <meta name="description" content="Live cluster status dashboard for the KubeApp Kubernetes deployment." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #050813;
+      --surface: rgba(255,255,255,0.04);
+      --surface2: rgba(255,255,255,0.07);
+      --border: rgba(255,255,255,0.08);
+      --accent1: #6c63ff;
+      --accent2: #00d4ff;
+      --accent3: #ff6b9d;
+      --green: #4caf50;
+      --yellow: #ffc107;
+      --text: #e8eaf6;
+      --muted: #7986cb;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    code, .mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* ── Background ── */
+    .bg-grid {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(108,99,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(108,99,255,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .bg-glow {
+      position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 500px;
+      background: radial-gradient(ellipse, rgba(108,99,255,0.12), transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 4rem;
+      background: rgba(5,8,19,0.75);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-size: 1.4rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-links { display: flex; gap: 2.5rem; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 0.9rem; font-weight: 500;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: #fff; }
+    .nav-cta {
+      padding: 0.55rem 1.4rem;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      border-radius: 50px; color: #fff !important;
+      font-weight: 600; font-size: 0.85rem;
+    }
+
+    /* ── Layout ── */
+    .page { position: relative; z-index: 1; padding: 7rem 2rem 4rem; max-width: 1200px; margin: 0 auto; }
+
+    .page-header {
+      margin-bottom: 3rem;
+      animation: fadeUp 0.5s ease both;
+    }
+    .page-header h1 {
+      font-size: 2.4rem; font-weight: 700; letter-spacing: -1px;
+    }
+    .page-header p { color: var(--muted); margin-top: 0.5rem; font-size: 0.95rem; }
+
+    /* ── Overview cards ── */
+    .overview {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem; margin-bottom: 2.5rem;
+      animation: fadeUp 0.5s 0.1s ease both;
+    }
+    .ov-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.5rem;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .ov-card:hover { border-color: rgba(108,99,255,0.4); transform: translateY(-3px); }
+    .ov-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 0.6rem; }
+    .ov-value { font-size: 2rem; font-weight: 800; }
+    .ov-value.ok { color: var(--green); }
+    .ov-value.accent { background: linear-gradient(135deg, var(--accent1), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .ov-sub { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; }
+
+    /* ── Section ── */
+    .section { margin-bottom: 2.5rem; animation: fadeUp 0.5s 0.2s ease both; }
+    .section-head {
+      display: flex; align-items: center; gap: 0.6rem;
+      margin-bottom: 1rem; font-size: 1.1rem; font-weight: 600;
+    }
+    .section-head .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent1); }
+
+    /* ── Table ── */
+    .tbl-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      text-align: left; font-size: 0.72rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 1px;
+      color: var(--muted); padding: 1rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+    tbody td {
+      padding: 0.9rem 1.2rem; font-size: 0.88rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr { transition: background 0.2s; }
+    tbody tr:hover { background: rgba(108,99,255,0.05); }
+
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.25rem 0.75rem; border-radius: 50px;
+      font-size: 0.78rem; font-weight: 600;
+    }
+    .status-pill.running {
+      background: rgba(76,175,80,0.15); color: #81c784;
+      border: 1px solid rgba(76,175,80,0.3);
+    }
+    .status-pill.running::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: #4caf50; box-shadow: 0 0 6px rgba(76,175,80,0.8);
+    }
+    .status-pill.clusterip {
+      background: rgba(0,212,255,0.12); color: #4dd0e1;
+      border: 1px solid rgba(0,212,255,0.25);
+    }
+    .status-pill.nodeport {
+      background: rgba(108,99,255,0.12); color: #a5b4fc;
+      border: 1px solid rgba(108,99,255,0.25);
+    }
+    .status-pill.ingress-type {
+      background: rgba(255,107,157,0.12); color: #f48fb1;
+      border: 1px solid rgba(255,107,157,0.25);
+    }
+    .mono-sm { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: var(--accent2); }
+
+    /* ── Topology ── */
+    .topology {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      animation: fadeUp 0.5s 0.3s ease both;
+    }
+    .topo-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.6rem; }
+    .topo-title .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent3); }
+
+    .topo-flow {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0; flex-wrap: wrap;
+    }
+    .topo-node {
+      padding: 1rem 1.6rem;
+      border-radius: 14px;
+      text-align: center;
+      min-width: 140px;
+      transition: transform 0.3s;
+    }
+    .topo-node:hover { transform: scale(1.05); }
+    .topo-node.client { background: rgba(255,107,157,0.12); border: 1px solid rgba(255,107,157,0.3); }
+    .topo-node.ingress-n { background: rgba(255,193,7,0.12); border: 1px solid rgba(255,193,7,0.3); }
+    .topo-node.frontend-n { background: rgba(0,212,255,0.12); border: 1px solid rgba(0,212,255,0.3); }
+    .topo-node.backend-n { background: rgba(108,99,255,0.12); border: 1px solid rgba(108,99,255,0.3); }
+    .topo-node .tn-icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
+    .topo-node .tn-label { font-size: 0.82rem; font-weight: 600; }
+    .topo-node .tn-sub { font-size: 0.7rem; color: var(--muted); margin-top: 0.2rem; }
+
+    .topo-arrow {
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 0.8rem; color: var(--muted); font-size: 1.2rem;
+      position: relative;
+    }
+    .topo-arrow::before {
+      content: '→'; font-size: 1.4rem;
+      background: linear-gradient(90deg, var(--accent3), var(--accent1));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .arrow-label {
+      position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%);
+      white-space: nowrap; font-size: 0.65rem; color: var(--muted);
+    }
+
+    /* ── Live time ── */
+    .live-bar {
+      margin-top: 2.5rem;
+      display: flex; align-items: center; gap: 0.8rem;
+      padding: 1rem 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 0.82rem; color: var(--muted);
+      animation: fadeUp 0.5s 0.4s ease both;
+    }
+    .live-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #f44336;
+      animation: blink 1.5s infinite;
+    }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      text-align: center; padding: 2rem;
+      font-size: 0.8rem; color: var(--muted);
+      position: relative; z-index: 1;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .page { padding: 6rem 1rem 3rem; }
+      .topo-flow { flex-direction: column; }
+      .topo-arrow { transform: rotate(90deg); padding: 0.5rem 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+
+  <nav>
+    <div class="logo">⎈ KubeApp</div>
+    <div class="nav-links">
+      <a href="/home.html">Home</a>
+      <a href="/status.html" class="active">Status</a>
+      <a href="#">Docs</a>
+      <a href="#" class="nav-cta">Get Started →</a>
+    </div>
+  </nav>
+
+  <div class="page">
+    <div class="page-header">
+      <h1>Cluster Status</h1>
+      <p>Real-time overview of your Kubernetes deployment health and topology.</p>
+    </div>
+
+    <!-- Overview tiles -->
+    <div class="overview">
+      <div class="ov-card">
+        <div class="ov-label">Pod Health</div>
+        <div class="ov-value ok">4 / 4</div>
+        <div class="ov-sub">All pods running</div>
+      </div>
+      <div class="ov-card">
+        <div class="ov-label">Services</div>
+        <div class="ov-value accent">2</div>
+        <div class="ov-sub">ClusterIP + NodePort</div>
+      </div>
+      <div class="ov-card">
+        <div class="ov-label">Ingress Rules</div>
+        <div class="ov-value accent">2</div>
+        <div class="ov-sub">/  and  /api</div>
+      </div>
+      <div class="ov-card">
+        <div class="ov-label">Namespace</div>
+        <div class="ov-value accent" style="font-size:1.6rem;">default</div>
+        <div class="ov-sub">Primary workspace</div>
+      </div>
+    </div>
+
+    <!-- Pods table -->
+    <div class="section">
+      <div class="section-head"><span class="dot"></span> Pods</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Image</th><th>Status</th><th>Replicas</th><th>Port</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono-sm">frontend-deployment-*-fpb8q</td>
+              <td>nginx:latest</td>
+              <td><span class="status-pill running">Running</span></td>
+              <td>1 of 2</td>
+              <td>80</td>
+            </tr>
+            <tr>
+              <td class="mono-sm">frontend-deployment-*-mxdxx</td>
+              <td>nginx:latest</td>
+              <td><span class="status-pill running">Running</span></td>
+              <td>2 of 2</td>
+              <td>80</td>
+            </tr>
+            <tr>
+              <td class="mono-sm">backend-deployment-*-dxwzn</td>
+              <td>hashicorp/http-echo</td>
+              <td><span class="status-pill running">Running</span></td>
+              <td>1 of 2</td>
+              <td>5678</td>
+            </tr>
+            <tr>
+              <td class="mono-sm">backend-deployment-*-xxxxx</td>
+              <td>hashicorp/http-echo</td>
+              <td><span class="status-pill running">Running</span></td>
+              <td>2 of 2</td>
+              <td>5678</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Services table -->
+    <div class="section">
+      <div class="section-head"><span class="dot"></span> Services</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Type</th><th>Port</th><th>Target</th><th>Selector</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono-sm">frontend-service</td>
+              <td><span class="status-pill nodeport">NodePort</span></td>
+              <td>80 → 30080</td>
+              <td>80</td>
+              <td>app=frontend</td>
+            </tr>
+            <tr>
+              <td class="mono-sm">backend-service</td>
+              <td><span class="status-pill clusterip">ClusterIP</span></td>
+              <td>80</td>
+              <td>5678</td>
+              <td>app=backend</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Ingress table -->
+    <div class="section">
+      <div class="section-head"><span class="dot"></span> Ingress</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Host</th><th>Path</th><th>Backend</th><th>Type</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono-sm">main-ingress</td>
+              <td>myapp.local</td>
+              <td>/</td>
+              <td>frontend-service:80</td>
+              <td><span class="status-pill ingress-type">Prefix</span></td>
+            </tr>
+            <tr>
+              <td class="mono-sm">main-ingress</td>
+              <td>myapp.local</td>
+              <td>/api</td>
+              <td>backend-service:80</td>
+              <td><span class="status-pill ingress-type">Prefix</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Topology -->
+    <div class="topology">
+      <div class="topo-title"><span class="dot"></span> Request Topology</div>
+      <div class="topo-flow">
+        <div class="topo-node client">
+          <div class="tn-icon">👤</div>
+          <div class="tn-label">Client</div>
+          <div class="tn-sub">Browser</div>
+        </div>
+        <div class="topo-arrow"><span class="arrow-label">myapp.local</span></div>
+        <div class="topo-node ingress-n">
+          <div class="tn-icon">🌐</div>
+          <div class="tn-label">Ingress</div>
+          <div class="tn-sub">main-ingress</div>
+        </div>
+        <div class="topo-arrow"><span class="arrow-label">path routing</span></div>
+        <div class="topo-node frontend-n">
+          <div class="tn-icon">🖥️</div>
+          <div class="tn-label">Frontend</div>
+          <div class="tn-sub">nginx × 2</div>
+        </div>
+        <div class="topo-arrow"><span class="arrow-label">/api</span></div>
+        <div class="topo-node backend-n">
+          <div class="tn-icon">⚙️</div>
+          <div class="tn-label">Backend</div>
+          <div class="tn-sub">http-echo × 2</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live bar -->
+    <div class="live-bar">
+      <div class="live-dot"></div>
+      <span>Live — Last updated: <strong id="timestamp"></strong></span>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2026 KubeApp · Cluster Status Dashboard &nbsp;⎈&nbsp; Namespace: <strong>default</strong>
+  </footer>
+
+  <script>
+    function updateTime() {
+      document.getElementById('timestamp').textContent = new Date().toLocaleString();
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+  </script>
+
+</body>
+</html>
