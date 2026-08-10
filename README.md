@@ -77,7 +77,8 @@ Generate Image Tag using Git Commit SHA
 Update Kubernetes Deployment Manifest
 Commit Updated Manifest
 Push Changes to GitHub
-<img width="1342" height="599" alt="Screenshot 2026-08-10 224720" src="https://github.com/user-attachments/assets/a6236249-24f6-43ca-ab39-73f0682983c9" />
+<img width="1342" height="599" alt="GitHub Actions" src="https://github.com/user-attachments/assets/7d539e82-3d2e-4b2c-bb5d-734617ad9fa7" />
+
 
 
 
