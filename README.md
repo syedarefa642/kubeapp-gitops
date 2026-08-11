@@ -370,7 +370,7 @@ Then save the changes.
 |---|---|
 | ☁️ **Cloud** | `AWS EC2` |
 | 🐳 **Containerization** | `Docker` `Docker Hub` |
-| ☸️ **Orchestration** | `Kubernetes` `K3s` |
+| ☸️ **Orchestration** | `Kubernetes` `K8s` |
 | 🐙 **GitOps / CD** | `ArgoCD` |
 | ⚙️ **CI** | `GitHub Actions` |
 | 🌐 **Web Server** | `Nginx` |
@@ -411,4 +411,5 @@ Then save the changes.
 ---
 # 👨‍💻 Author
 **Syeda Refa**
+
 DevOps | Kubernetes | Docker | GitHub Actions | ArgoCD | AWS | CI/CD
