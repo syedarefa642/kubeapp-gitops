@@ -290,14 +290,6 @@ kubeapp-gitops/
 ├── .github/
 │   └── workflows/
 │       └── build-push.yaml
-│
-├── images/
-│   ├── architecture.png
-│   ├── github-actions.png
-│   ├── argocd.png
-│   ├── dockerhub.png
-│   └── website.png
-│
 └── README.md
 ```
 
